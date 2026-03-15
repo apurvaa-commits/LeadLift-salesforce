@@ -4,6 +4,7 @@ import getPipelineData from '@salesforce/apex/LeadLiftController.getPipelineData
 export default class LeadLiftDatasets extends LightningElement {
     @api data = [];
     isGenerating = false;
+    isDragging = false; // Added to track drag hover state
 
     async loadFromSalesforce() {
         this.isGenerating = true;
@@ -77,5 +78,115 @@ export default class LeadLiftDatasets extends LightningElement {
 
     get hasData() {
         return this.data && this.data.length > 0;
+    }
+
+    // --- File Upload Logic ---
+    triggerFileUpload() {
+        const fileInput = this.template.querySelector('.hidden-input');
+        if (fileInput) fileInput.click();
+    }
+
+    handleFileUpload(event) {
+        if (event.target.files.length > 0) {
+            this.processFile(event.target.files[0]);
+        }
+    }
+
+    handleDragEnter(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isDragging = true;
+    }
+
+    handleDragOver(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isDragging = true;
+    }
+
+    handleDragLeave(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isDragging = false;
+    }
+
+    handleDrop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isDragging = false;
+        if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+            this.processFile(event.dataTransfer.files[0]);
+        }
+    }
+
+    get uploadZoneClass() {
+        return this.isDragging ? 'upload-zone drag-active' : 'upload-zone';
+    }
+
+    processFile(file) {
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            alert('Please upload a valid CSV file.');
+            return;
+        }
+        this.isGenerating = true;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            this.parseCSV(e.target.result);
+        };
+        reader.onerror = () => {
+            alert('Error reading file');
+            this.isGenerating = false;
+        };
+        reader.readAsText(file);
+    }
+
+    parseCSV(csvText) {
+        try {
+            const lines = csvText.split('\n').filter(line => line.trim().length > 0);
+            if (lines.length < 2) throw new Error('CSV is empty or missing data');
+            
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            const parsedData = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                // Split respecting quotes
+                const currentLine = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                if (currentLine.length === headers.length) {
+                    const company = currentLine[headers.indexOf('company')]?.replace(/"/g, '').trim() || 'Unknown';
+                    const valueStr = currentLine[headers.indexOf('value')]?.replace(/"/g, '').trim() || '0';
+                    const stage = currentLine[headers.indexOf('stage')]?.replace(/"/g, '').trim() || 'Prospecting';
+                    const probStr = currentLine[headers.indexOf('probability')]?.replace(/"/g, '').trim() || '0';
+                    const riskStr = currentLine[headers.indexOf('risk')]?.replace(/"/g, '').trim();
+                    
+                    const value = parseFloat(valueStr) || 0;
+                    const probability = parseInt(probStr) || 0;
+                    
+                    let risk = riskStr || (probability > 70 ? 'Low' : probability > 40 ? 'Medium' : 'High');
+                    
+                    parsedData.push({
+                        id: `CSV_OPP_${Date.now()}_${i}`,
+                        company: company,
+                        value: value,
+                        formattedValue: new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value),
+                        stage: stage,
+                        probability: probability,
+                        risk: risk,
+                        isLowRisk: risk.toLowerCase() === 'low',
+                        isMediumRisk: risk.toLowerCase() === 'medium',
+                        isHighRisk: risk.toLowerCase() === 'high',
+                        lastEmail: `Discussing next steps for ${company}...`,
+                        emailSummary: `Prospect at ${company} is evaluating our offering based on the recent follow-up.`,
+                        draftResponse: `Hi,\n\nFollowing up on our recent ${stage} discussions for ${company}. Let's secure a time to finalize details.\n\nBest,\nYour Lead Lift AI`
+                    });
+                }
+            }
+            
+            this.dispatchEvent(new CustomEvent('dataupdate', { detail: { data: parsedData } }));
+        } catch(error) {
+            console.error('Error parsing CSV', error);
+            alert('Error parsing CSV file. Please ensure it has headers: Company,Value,Stage,Probability,Risk');
+        } finally {
+            this.isGenerating = false;
+        }
     }
 }

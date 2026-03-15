@@ -45,9 +45,9 @@
     transition: all 0.3s ease;
 }
 
-.upload-zone:hover {
+.upload-zone:hover, .upload-zone.drag-active {
     border-color: var(--primary);
-    background: rgba(139, 92, 246, 0.05);
+    background: rgba(139, 92, 246, 0.15);
 }
 
 .upload-icon {

@@ -62,10 +62,10 @@
                                     <h4 class="box-title text-secondary">✨ Personalized Suggested Response</h4>
                                     
                                     <template if:false={opp.isApproved}>
-                                         <textarea class="draft-textarea" rows="7" value={opp.draftResponse}></textarea>
+                                         <lightning-textarea class="draft-textarea-wrapper" variant="label-hidden" value={opp.draftResponse}></lightning-textarea>
                                     </template>
                                     <template if:true={opp.isApproved}>
-                                         <textarea class="draft-textarea" rows="7" disabled value={opp.draftResponse}></textarea>
+                                         <lightning-textarea class="draft-textarea-wrapper" variant="label-hidden" value={opp.draftResponse} disabled></lightning-textarea>
                                     </template>
                                 </div>
                             </div>

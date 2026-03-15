@@ -16,11 +16,11 @@
             <!-- Upload Panel -->
             <div class="upload-panel glass-panel animate-slide-in">
                 <h2>Ingest Data</h2>
-                <div class="upload-zone">
+                <div class={uploadZoneClass} onclick={triggerFileUpload} ondragenter={handleDragEnter} ondragover={handleDragOver} ondragleave={handleDragLeave} ondrop={handleDrop}>
                     <div class="upload-icon">☁️</div>
                     <h3>Drag & Drop CSV</h3>
                     <p class="text-muted">Or click to browse your files</p>
-                    <input type="file" accept=".csv" class="hidden-input"/>
+                    <input type="file" accept=".csv" class="hidden-input" onchange={handleFileUpload}/>
                 </div>
                 
                 <div class="divider">-- OR --</div>
