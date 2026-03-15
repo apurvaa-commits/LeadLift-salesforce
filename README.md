@@ -22,18 +22,6 @@ LeadLift solves this by integrating AI capabilities into Salesforce to analyze l
 - HTML & CSS
 - Git & GitHub
 
-## Project Structure
-
-LeadLift-salesforce
-│
-├── force-app
-│ ├── classes
-│ └── lwc
-│ ├── leadLiftApp
-│ ├── leadLiftDashboard
-│ ├── leadLiftDatasets
-│ └── leadLiftEmailOutreach
-
 ## Future Improvements
 - Advanced AI lead scoring
 - Integration with external AI APIs
