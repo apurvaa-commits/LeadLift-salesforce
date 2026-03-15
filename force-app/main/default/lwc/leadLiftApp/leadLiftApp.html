@@ -1,0 +1,62 @@
+<template>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar glass-panel">
+            <div class="logo-container">
+                <div class="logo-icon"></div>
+                <h2>Lead Lift</h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class={dashboardNavClass} onclick={handleNavDashboard}>
+                    <span class="icon">📊</span> Command Center
+                </button>
+                <button class={datasetsNavClass} onclick={handleNavDatasets}>
+                    <span class="icon">📁</span> CRM Datasets
+                </button>
+                <button class={emailNavClass} onclick={handleNavEmail}>
+                    <span class="icon">✉️</span> Email Outreach
+                </button>
+            </nav>
+
+            <div class="nav-footer">
+                <button class={settingsNavClass} onclick={handleNavSettings}>
+                    <span class="icon">⚙️</span> Settings
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <template if:true={isDashboard}>
+                <c-lead-lift-dashboard data={data}></c-lead-lift-dashboard>
+            </template>
+            
+            <template if:true={isDatasets}>
+                <c-lead-lift-datasets data={data} ondataupdate={handleDataUpdate}></c-lead-lift-datasets>
+            </template>
+
+            <template if:true={isEmail}>
+                <c-lead-lift-email-outreach data={data}></c-lead-lift-email-outreach>
+            </template>
+
+            <template if:true={isSettings}>
+                <!-- Fallback Settings View -->
+                <main class="settings-view glass-panel">
+                    <h1 class="text-gradient">Configuration Settings</h1>
+                    <p class="text-muted">System administration requires Enterprise Admin credentials.</p>
+                </main>
+            </template>
+        </div>
+
+        <!-- Floating Chatbot Toggle -->
+        <button class="chatbot-toggle" onclick={toggleChatbot}>
+            💬
+        </button>
+
+        <!-- Chatbot Component -->
+        <template if:true={chatbotOpen}>
+            <c-lead-lift-chatbot data={data} onclose={toggleChatbot}></c-lead-lift-chatbot>
+        </template>
+    </div>
+</template>

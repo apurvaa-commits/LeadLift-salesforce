@@ -1,0 +1,86 @@
+<template>
+    <main class="datasets-panel">
+        <header class="glass-panel animate-fade-in dashboard-header">
+            <div>
+                <h1 class="text-gradient">CRM Data Ingestion</h1>
+                <p class="text-muted">Import custom CSV datasets or connect directly to Salesforce.</p>
+            </div>
+            <div class="header-actions">
+                <template if:true={hasData}>
+                    <span class="badge success">{data.length} Records Active</span>
+                </template>
+            </div>
+        </header>
+
+        <div class="content-row">
+            <!-- Upload Panel -->
+            <div class="upload-panel glass-panel animate-slide-in">
+                <h2>Ingest Data</h2>
+                <div class="upload-zone">
+                    <div class="upload-icon">☁️</div>
+                    <h3>Drag & Drop CSV</h3>
+                    <p class="text-muted">Or click to browse your files</p>
+                    <input type="file" accept=".csv" class="hidden-input"/>
+                </div>
+                
+                <div class="divider">-- OR --</div>
+                
+                <button class="btn btn-primary w-full" onclick={loadFromSalesforce} disabled={isGenerating}>
+                    <span class="icon">🔌</span> Load from Salesforce
+                </button>
+                
+                <div class="divider">-- OR --</div>
+                
+                <button class="btn btn-primary w-full" onclick={generateDummyData} disabled={isGenerating}>
+                    <span class="icon">✨</span> Auto-Generate Data (INR)
+                </button>
+            </div>
+
+            <!-- Data Table -->
+            <div class="table-panel glass-panel animate-fade-in" style="animation-delay: 0.2s;">
+                <template if:true={hasData}>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>OPP ID</th>
+                                    <th>Company</th>
+                                    <th>Value</th>
+                                    <th>Stage</th>
+                                    <th>Prob.</th>
+                                    <th>Risk</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={data} for:item="row">
+                                    <tr key={row.id}>
+                                        <td>{row.id}</td>
+                                        <td class="company-name">{row.company}</td>
+                                        <td class="value">{row.formattedValue}</td>
+                                        <td>{row.stage}</td>
+                                        <td>{row.probability}%</td>
+                                        <td>
+                                            <span if:true={row.isLowRisk} class="badge success">Low</span>
+                                            <span if:true={row.isMediumRisk} class="badge warning">Medium</span>
+                                            <span if:true={row.isHighRisk} class="badge danger">High</span>
+                                            <span if:false={row.isLowRisk}>
+                                                <span if:false={row.isMediumRisk}>
+                                                    <span if:false={row.isHighRisk} class="badge warning">{row.risk}</span>
+                                                </span>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </template>
+                <template if:false={hasData}>
+                    <div class="empty-state text-muted">
+                        No data loaded. Connect to Salesforce or generate synthetic data to preview the pipeline.
+                    </div>
+                </template>
+            </div>
+        </div>
+    </main>
+</template>

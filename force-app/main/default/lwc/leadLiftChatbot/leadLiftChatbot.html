@@ -1,0 +1,65 @@
+<template>
+    <div class="chatbot-container glass-panel animate-slide-up">
+        
+        <!-- Header -->
+        <div class="chatbot-header">
+            <div class="header-info">
+                <div class="bot-avatar">🤖</div>
+                <div>
+                    <h3>Lead Lift AI</h3>
+                    <span class="status online">● Online</span>
+                </div>
+            </div>
+            <button class="close-btn" onclick={handleClose}>×</button>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="chatbot-messages">
+            <template for:each={messages} for:item="msg">
+                <div key={msg.id} class={msg.cssClass}>
+                    <div class="message-bubble">
+                        <!-- Render text and bold rendering -->
+                        <p>{msg.text}</p>
+                        
+                        <!-- Render action buttons if any -->
+                        <template if:true={msg.actions}>
+                            <div class="message-actions">
+                                <template for:each={msg.actions} for:item="action">
+                                    <button key={action.label} class="btn btn-outline-small" data-action={action.value} onclick={handleActionClick}>
+                                        {action.label}
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+            
+            <!-- Typing Indicator -->
+            <template if:true={isTyping}>
+                <div class="message bot typing">
+                    <div class="message-bubble typing-indicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Input Area -->
+        <div class="chatbot-input">
+            <input 
+                type="text" 
+                placeholder="Ask your Sales Copilot..." 
+                value={inputValue}
+                oninput={handleInputChange}
+                onkeypress={handleKeyPress}
+            />
+            <button class="send-btn" onclick={handleSend} disabled={isSendDisabled}>
+                <svg viewBox="0 0 24 24" fill="none" class="send-icon">
+                    <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</template>

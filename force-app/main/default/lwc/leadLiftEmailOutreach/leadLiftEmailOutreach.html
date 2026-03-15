@@ -1,0 +1,79 @@
+<template>
+    <main class="email-panel">
+        <header class="glass-panel animate-fade-in dashboard-header">
+            <div>
+                <h1 class="text-gradient">Personalized Email Outreach</h1>
+                <p class="text-muted">Review AI-summarized inbound emails and approve hyper-personalized responses.</p>
+            </div>
+            <div class="header-stats text-right">
+                <span class="stat-large text-primary">{totalApproved}</span>
+                <span class="text-muted text-sm ml-2">Emails Approved & Sent</span>
+            </div>
+        </header>
+
+        <div class="list-container animate-fade-in" style="animation-delay: 0.2s;">
+            <template if:false={hasData}>
+                <div class="empty-state glass-panel text-muted">
+                    <p>No data loaded. Connect CRM Data to view email outreach.</p>
+                </div>
+            </template>
+            
+            <template if:true={hasData}>
+                <template for:each={processedData} for:item="opp">
+                    <div key={opp.id} class="glass-panel email-card">
+                        
+                        <!-- Header Row -->
+                        <div class="card-header border-bottom">
+                            <div>
+                                <h2>{opp.company}</h2>
+                                <span class="stage-label text-muted">{opp.stage} &bull; {opp.formattedValue}</span>
+                            </div>
+                            <div>
+                                <template if:false={opp.isApproved}>
+                                    <button class="btn btn-primary" data-id={opp.id} onclick={handleApprove}>
+                                        Approve & Send
+                                    </button>
+                                </template>
+                                <template if:true={opp.isApproved}>
+                                    <span class="badge success">✨ Sent Successfully</span>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Content Grid -->
+                        <div class="card-grid">
+                            
+                            <!-- Analysis Column -->
+                            <div class="column-left">
+                                <div class="message-box bg-dark">
+                                    <h4 class="box-title text-muted">✉️ Latest Received Email</h4>
+                                    <p class="box-content">"{opp.lastEmail}"</p>
+                                </div>
+                                <div class="message-box bg-primary-light border-primary">
+                                    <h4 class="box-title text-primary">🤖 AI Context Summary</h4>
+                                    <p class="box-content">{opp.emailSummary}</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Draft Column -->
+                            <div class="column-right">
+                                <div class="draft-box border-secondary relative">
+                                    <span class="draft-badge">Drafted by GenAI</span>
+                                    <h4 class="box-title text-secondary">✨ Personalized Suggested Response</h4>
+                                    
+                                    <template if:false={opp.isApproved}>
+                                         <textarea class="draft-textarea" rows="7" value={opp.draftResponse}></textarea>
+                                    </template>
+                                    <template if:true={opp.isApproved}>
+                                         <textarea class="draft-textarea" rows="7" disabled value={opp.draftResponse}></textarea>
+                                    </template>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </main>
+</template>
